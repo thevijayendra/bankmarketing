@@ -150,7 +150,6 @@ Each model was trained using an 80-20 train-test split and evaluated using the f
 | Naive Bayes                 | 0.7501   | 0.8128 | 0.7162    | 0.7901 | 0.7513 | 0.5039 |
 | Random Forest (Ensemble)    | 0.8370   | 0.9123 | 0.8086    | 0.8632 | 0.8350 | 0.6757 |
 | XGBoost (Ensemble)          | 0.8424   | 0.9143 | 0.8178    | 0.8622 | 0.8394 | 0.6858 |
-
 ---
 
 ### 🏆 Best Performing Model
