@@ -67,30 +67,12 @@ def safe_auc(y_true, y_prob):
 # ============================================================
 st.sidebar.markdown("## ⚙️ Model Configuration")
 
-# uploaded_file = st.sidebar.file_uploader(
-#     "Upload Dataset (CSV)",
-#     type=["csv"]
-# )
 
 with st.sidebar.expander("📂 Upload Dataset", expanded=False):
     uploaded_file = st.file_uploader(
         label="",
         type=["csv"]
     )
-
-# # Load dataset
-# if uploaded_file:
-#     data = pd.read_csv(uploaded_file)
-# else:
-#     if os.path.exists("bank.csv"):
-#         data = pd.read_csv("bank.csv")
-#     else:
-#         st.error("❌ Dataset not found. Please upload a CSV file.")
-#         st.stop()
-
-# ============================================================
-# Dataset Loading
-# ============================================================
 
 data = None
 
