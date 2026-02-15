@@ -56,31 +56,63 @@ def get_model(model_name: str):
     return model_registry[model_name]()
 
 
+def safe_auc(y_true, y_prob):
+    if len(set(y_true)) < 2:
+        return 0
+    return roc_auc_score(y_true, y_prob)
+
+
 # ============================================================
 # Sidebar Configuration
 # ============================================================
 st.sidebar.markdown("## ⚙️ Model Configuration")
 
-uploaded_file = st.sidebar.file_uploader(
-    "Upload Dataset (CSV)",
-    type=["csv"]
-)
+# uploaded_file = st.sidebar.file_uploader(
+#     "Upload Dataset (CSV)",
+#     type=["csv"]
+# )
 
-# Load dataset
-if uploaded_file:
+with st.sidebar.expander("📂 Upload Dataset", expanded=False):
+    uploaded_file = st.file_uploader(
+        label="",
+        type=["csv"]
+    )
+
+# # Load dataset
+# if uploaded_file:
+#     data = pd.read_csv(uploaded_file)
+# else:
+#     if os.path.exists("bank.csv"):
+#         data = pd.read_csv("bank.csv")
+#     else:
+#         st.error("❌ Dataset not found. Please upload a CSV file.")
+#         st.stop()
+
+# ============================================================
+# Dataset Loading
+# ============================================================
+
+data = None
+
+if uploaded_file is not None:
     data = pd.read_csv(uploaded_file)
-else:
-    if os.path.exists("bank.csv"):
-        data = pd.read_csv("bank.csv")
-    else:
-        st.error("❌ Dataset not found. Please upload a CSV file.")
-        st.stop()
+elif os.path.exists("bank.csv"):
+    data = pd.read_csv("bank.csv")
+
+# If dataset is still None, show friendly message
+if data is None:
+    st.info("📂 Please upload a CSV dataset to start model training.")
+    st.stop()
+
 
 # Training mode selection
 training_mode = st.sidebar.radio(
     "Select Training Mode",
     ["Train Selected Model", "Train & Compare All Models"]
 )
+
+# Disable model selection if "Train & Compare All Models" is chosen
+disable_model_select = training_mode == "Train & Compare All Models"
 
 # Model selection
 selected_model_name = st.sidebar.selectbox(
@@ -92,7 +124,8 @@ selected_model_name = st.sidebar.selectbox(
         "Naive Bayes",
         "Random Forest (Ensemble)",
         "XGBoost (Ensemble)"
-    ]
+    ],
+    disabled=disable_model_select
 )
 
 run_button = st.sidebar.button("🚀 Run Model")
@@ -159,7 +192,8 @@ if run_button:
 
         metrics = {
             "Accuracy": accuracy_score(y_test, y_pred),
-            "AUC Score": roc_auc_score(y_test, y_prob),
+            # "AUC Score": roc_auc_score(y_test, y_prob),
+            "AUC Score": safe_auc(y_test, y_prob),
             "Precision": precision_score(y_test, y_pred),
             "Recall": recall_score(y_test, y_pred),
             "F1 Score": f1_score(y_test, y_pred),
@@ -214,8 +248,8 @@ if run_button:
 
             comparison_results.append({
                 "Model": model_name,
-                "Accuracy": accuracy_score(y_test, y_pred),
-                "AUC": roc_auc_score(y_test, y_prob),
+                "Accuracy": accuracy_score(y_test, y_pred),             
+                "AUC Score": safe_auc(y_test, y_prob),
                 "Precision": precision_score(y_test, y_pred),
                 "Recall": recall_score(y_test, y_pred),
                 "F1 Score": f1_score(y_test, y_pred),
